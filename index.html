@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Model Roket 3D | Plotly + Pyodide</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Plotly.js CDN -->
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
     <style>
         body {
@@ -15,7 +16,7 @@
         }
         h2 {
             margin-top: 18px;
-            color: #333; /* Warna judul */
+            color: #333;
         }
         #plot {
             width: 97vw;
@@ -23,7 +24,7 @@
             margin: 2vw auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06); /* Sedikit lebih gelap */
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
         }
         #loading {
             margin-top: 30vh;
@@ -46,11 +47,13 @@
     <div id="loading">Memuat Lingkungan Python & Visualisasi...<br>Mohon tunggu.</div>
     <div id="plot" style="display:none"></div>
 
+    <!-- Pyodide CDN -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
 
+    <!-- KODE PYTHON YANG TERTANAM DIMULAI DI SINI -->
     <script type="text/python">
 import micropip
-# Pastikan numpy dan plotly terinstal
+# Pastikan numpy dan plotly terinstal. micropip harus diinstal di JavaScript terlebih dahulu.
 await micropip.install("numpy")
 await micropip.install("plotly")
 
@@ -59,10 +62,6 @@ import plotly.graph_objects as go
 import json # Diperlukan untuk json.dumps
 
 # --- 1. Primitive Generation Functions ---
-# (Ini adalah fungsi-fungsi yang sudah Anda miliki untuk membuat bentuk 3D: cube, cylinder, cone, sphere, torus)
-# PASTE KODE FUNGSI PRIMITIF ANDA DI SINI
-# Mulai dari def create_cube_mesh(...) hingga def create_sphere_mesh(...)
-# (Pastikan Anda menggunakan versi terbaru yang sudah dikoreksi)
 
 def create_cube_mesh(center=[0,0,0], size=[1,1,1]):
     """
@@ -245,8 +244,6 @@ def create_sphere_mesh(center=[0,0,0], radius=0.5, segments=20):
 
 
 # --- 2. Transformation Functions ---
-# (Ini adalah fungsi-fungsi transformasi Anda: translate, rotate_x, rotate_y, rotate_z, scale, compose)
-# PASTE KODE FUNGSI TRANSFORMASI ANDA DI SINI
 
 def translate(vertices, tx, ty, tz):
     """Translates vertices by (tx, ty, tz)."""
@@ -287,8 +284,6 @@ def scale(vertices, sx, sy, sz):
     return vertices * np.array([sx, sy, sz])
 
 # --- 3. Scene Graph Definition for Rocket ---
-# (Ini adalah definisi scene_graph Anda untuk roket)
-# PASTE KODE SCENE GRAPH ANDA DI SINI
 
 scene_graph = {
     "rocket": {
@@ -357,11 +352,11 @@ scene_graph = {
             {
                 "name": "window_1",
                 "type": "primitive",
-                "shape": "sphere", # We'll create a sphere mesh function
+                "shape": "sphere",
                 "color": "lightblue",
                 "initial_radius": 0.3,
                 "transformations": [
-                    {"type": "translate", "params": [0.8, 0, 5.0]} # On the body, higher up
+                    {"type": "translate", "params": [0.8, 0, 5.0]}
                 ]
             },
             {
@@ -371,8 +366,7 @@ scene_graph = {
                 "color": "lightblue",
                 "initial_radius": 0.3,
                 "transformations": [
-                    {"type": "translate", "params": [0.8 * np.cos(np.deg2rad(90)), 0.8 * np.sin(np.deg2rad(90)), 4.0]}, # Rotated around body
-                    # {"type": "rotate_z", "params": [90]} # Not needed if position is calculated
+                    {"type": "translate", "params": [0.8 * np.cos(np.deg2rad(90)), 0.8 * np.sin(np.deg2rad(90)), 4.0]},
                 ]
             },
              {
@@ -382,8 +376,7 @@ scene_graph = {
                 "color": "lightblue",
                 "initial_radius": 0.3,
                 "transformations": [
-                    {"type": "translate", "params": [0.8 * np.cos(np.deg2rad(180)), 0.8 * np.sin(np.deg2rad(180)), 5.0]}, # Rotated around body
-                    # {"type": "rotate_z", "params": [180]}
+                    {"type": "translate", "params": [0.8 * np.cos(np.deg2rad(180)), 0.8 * np.sin(np.deg2rad(180)), 5.0]},
                 ]
             },
             # Engine Exhaust (Smaller cylinder at the bottom)
@@ -395,7 +388,7 @@ scene_graph = {
                 "initial_radius": 0.7,
                 "initial_height": 1.0,
                 "transformations": [
-                    {"type": "translate", "params": [0, 0, -0.5]} # Below the body base
+                    {"type": "translate", "params": [0, 0, -0.5]}
                 ]
             },
             # Engine Nozzles (Smaller cones inside the exhaust)
@@ -407,8 +400,8 @@ scene_graph = {
                 "initial_radius": 0.3,
                 "initial_height": 0.8,
                 "transformations": [
-                    {"type": "translate", "params": [0.3, 0.3, -0.9]}, # Inside exhaust, slightly offset
-                    {"type": "rotate_x", "params": [180]} # Pointing downwards
+                    {"type": "translate", "params": [0.3, 0.3, -0.9]},
+                    {"type": "rotate_x", "params": [180]}
                 ]
             },
              {
@@ -429,10 +422,10 @@ scene_graph = {
                 "type": "primitive",
                 "shape": "torus",
                 "color": "gold",
-                "initial_major_radius": 1.1, # Slightly larger than body radius
+                "initial_major_radius": 1.1,
                 "initial_minor_radius": 0.05,
                 "transformations": [
-                    {"type": "translate", "params": [0, 0, 5.5]}, # Near the nose cone joint
+                    {"type": "translate", "params": [0, 0, 5.5]},
                 ]
             },
             {
@@ -443,7 +436,7 @@ scene_graph = {
                 "initial_major_radius": 1.1,
                 "initial_minor_radius": 0.05,
                 "transformations": [
-                    {"type": "translate", "params": [0, 0, 1.5]}, # Lower part of the body
+                    {"type": "translate", "params": [0, 0, 1.5]},
                 ]
             }
         ]
@@ -452,8 +445,6 @@ scene_graph = {
 
 
 # --- 4. Scene Traversal and Plotly Generation ---
-# (Ini adalah fungsi build_scene dan create_rocket_figure Anda)
-# PASTE KODE FUNGSI build_scene DAN create_rocket_figure ANDA DI SINI
 
 def build_scene(scene_graph_node):
     """
@@ -502,19 +493,22 @@ def build_scene(scene_graph_node):
             else:
                 print(f"Warning: Unknown transformation type: {t_type}")
         
-        # Convert color tuple (R,G,B) to 'rgb(R*255, G*255, B*255)' string for Plotly
-        # This assumes your colors in scene_graph are float (0-1) tuples
+        # Color handling: ensure it's a string Plotly understands
+        # If color is a tuple (e.g., (0.8,0.8,0.8)), convert it to "rgb(R,G,B)" string
+        # Your scene_graph uses string colors ("silver", "red", etc.), so this conversion
+        # might not be strictly needed unless you plan to use RGB tuples.
+        # Keeping it for robustness.
         if isinstance(color, tuple) and len(color) == 3:
             plotly_color = f'rgb({int(color[0]*255)},{int(color[1]*255)},{int(color[2]*255)})'
         else:
-            plotly_color = color # Assume it's already a valid Plotly color string (e.g., "silver")
+            plotly_color = color # Assume it's already a valid Plotly color string (e.g., "silver", "red")
 
         traces.append(go.Mesh3d(
             x=vertices[:,0], y=vertices[:,1], z=vertices[:,2],
             i=faces[:,0], j=faces[:,1], k=faces[:,2],
-            color=plotly_color, # Gunakan warna yang sudah diformat
-            opacity=1.0,
-            flatshading=True
+            color=plotly_color,
+            opacity=1.0, # Make rocket parts fully opaque
+            flatshading=True # For a more "faceted" look, common for toy models
         ))
         
     elif scene_graph_node["type"] == "group":
@@ -523,13 +517,14 @@ def build_scene(scene_graph_node):
             
     return traces
 
+# Create the Plotly figure
 def create_rocket_figure():
     traces = build_scene(scene_graph["rocket"])
     
     fig = go.Figure(data=traces)
 
     fig.update_layout(
-        title='3D Rocket Model (Pyodide Embedded)', # Ganti judul
+        title='3D Rocket Model', # Judul untuk tampilan itch.io
         scene=dict(
             xaxis=dict(showbackground=False, showticklabels=False, zeroline=False, visible=False),
             yaxis=dict(showbackground=False, showticklabels=False, zeroline=False, visible=False),
@@ -538,23 +533,25 @@ def create_rocket_figure():
             camera=dict(
                 eye=dict(x=1.8, y=1.8, z=1.0), # Camera position, looking slightly down at the rocket
                 center=dict(x=0, y=0, z=3.0), # Center of the rocket
-                up=dict(x=0, y=0, 1) # Z-axis is up
+                up=dict(x=0, y=0, z=1) # Z-axis is up
             ),
         ),
         margin=dict(l=0, r=0, b=0, t=30),
         showlegend=False,
-        width=700, # Perhatikan lebar dan tinggi, bisa disesuaikan dengan CSS
-        height=500
+        # Mengatur ukuran figure yang akan disematkan di div#plot
+        width=None, # Akan diatur oleh CSS width: 97vw
+        height=None # Akan diatur oleh CSS height: 82vh
     )
     return fig
 
-# --- Main execution logic in Python ---
+# --- Main execution logic in Python untuk Pyodide ---
+# Kode ini akan dieksekusi setelah Pyodide dimuat
 scene = build_scene(scene_graph["rocket"])
 fig = create_rocket_figure()
 
 # Mengirim data Plotly ke JavaScript untuk ditampilkan
 fig_json = fig.to_plotly_json()
-import js
+import js # Ini disediakan oleh Pyodide
 js_code = f"""
 document.getElementById('loading').style.display = 'none';
 document.getElementById('plot').style.display = 'block';
@@ -563,13 +560,14 @@ Plotly.newPlot('plot', {json.dumps(fig_json)});
 js.eval(js_code)
     </script>
 
+    <!-- Skrip JavaScript utama untuk memuat Pyodide dan menjalankan Python -->
     <script>
         async function main() {
             let pyodide = await loadPyodide({
                 indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.1/full/",
             });
             // micropip akan diinstal oleh kode Python pertama di atas
-            // await pyodide.loadPackage(["micropip"]); // Ini akan dipanggil oleh script python
+            await pyodide.loadPackage("micropip"); // Memuat micropip di JavaScript sebelum Python dijalankan
 
             // Menjalankan kode Python yang tertanam
             const pythonCode = document.querySelector('script[type="text/python"]').textContent;
