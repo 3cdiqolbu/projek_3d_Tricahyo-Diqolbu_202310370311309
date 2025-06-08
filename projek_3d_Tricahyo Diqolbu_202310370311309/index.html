@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Rocket Model</title>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js" charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0; /* Light grey background */
+            font-family: sans-serif;
+            flex-direction: column;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #plotly-div {
+            width: 80vw;
+            height: 80vh;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #loading-message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>3D Rocket Model with Python and Plotly</h1>
+    <div id="plotly-div"></div>
+    <div id="loading-message">Loading Python environment...</div>
+
+    <script type="text/javascript">
+        async function main() {
+            let pyodide = await loadPyodide({
+                indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
+            });
+            await pyodide.loadPackage("numpy"); // Load numpy for numerical operations
+
+            // Fetch and run the Python script
+            const response = await fetch("main.py");
+            const pythonCode = await response.text();
+            await pyodide.runPythonAsync(pythonCode);
+
+            document.getElementById("loading-message").innerText = "Model loaded successfully!";
+        }
+        main();
+    </script>
+</body>
+</html>
